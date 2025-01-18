@@ -60,10 +60,3 @@ class Card():
 
     def __str__(self) -> str:
         return f'{self.label} of {["Hearts", "Diamonds", "Clubs", "Spades"][self.suit]}'
-    
-class CardGroup():
-    def __init__(self, cards: list[Card]):
-        self.cards = cards
-    
-    def draw(self, screen: pygame.Surface, pos: tuple[float, float], size: tuple[float, float], style: Literal['Stack', 'Overlap', 'Separate'] = 'Separate', direction: Literal['Up', 'Down', 'Left', 'Right'] = 'Right', face: Literal['Up', 'Down'] = 'Up', spacing: float = 5):
-        Card.drawCards(screen, self.cards, pos, size, style, direction, face, spacing)

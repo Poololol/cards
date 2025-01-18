@@ -1,6 +1,7 @@
 import pygame
 import utils
-from card import Card, CardGroup
+from card import Card
+from CardGroup import CardGroup
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((501, 501), pygame.RESIZABLE)
@@ -12,8 +13,9 @@ def main():
     card2 = Card(13, 1)
     card3 = Card(7, 2)
     card4 = Card(14, 3)
-    cards = CardGroup([card1, card2, card3, card4])
-
+    card5 = Card(2, 4)
+    cards = CardGroup([card1, card2, card3, card4, card5])
+    
     cardWidth = 80
     cardSize = (cardWidth, cardWidth*1.5)
 
