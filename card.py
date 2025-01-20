@@ -76,3 +76,6 @@ class Card():
 
     def __str__(self) -> str:
         return f'{self.label} of {["Hearts", "Diamonds", "Clubs", "Spades"][self.suit]}'
+    
+    def __repr__(self) -> str:
+        return str(self)
