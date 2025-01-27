@@ -5,9 +5,22 @@ from card import Card
 
 font = pygame.font.Font(None, 36)
 
+def suitSort(card: Card) -> tuple[int, int]:
+    if card.suit == 0:
+        return 0, 14 - card.value
+    elif card.suit == 1:
+        return 2, 14 - card.value
+    elif card.suit == 2:
+        return 1, 14 - card.value
+    else:
+        return 3, 14 - card.value
+
 class CardGroup():
-    def __init__(self, cards: list[Card] = []) -> None:
+    def __init__(self, cards: list[Card] = [], maxSelected: int = -1) -> None:
         self.cards = cards
+        self.cardsReversed = cards[::-1]
+        self.maxSelected = maxSelected
+        self.selectedCards = [False]*len(cards)
     
     def draw(self, screen: pygame.Surface, pos: tuple[float, float], size: tuple[float, float], 
              style: Literal['Stack', 'Overlap', 'Separate'] = 'Overlap',
@@ -20,8 +33,29 @@ class CardGroup():
                 spacing = size[0]/2
             else:
                 spacing = 5
+        self.screen = screen
         Card.drawCards(screen, self.cards, pos, size, style, direction, face, spacing)
     
+    def processEvent(self, event: pygame.event.Event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            for card in self.cardsReversed:
+                if card.rect.collidepoint(event.pos):
+                    #card.processEvent(event)
+                    if card.raised:
+                        card.raised = False
+                        self.selectedCards[self.cards.index(card)] = False
+                    elif (self.selectedCards.count(True) < self.maxSelected or self.maxSelected == -1):
+                        card.raised = True
+                        self.selectedCards[self.cards.index(card)] = True
+                    break
+
+    def processMouse(self, pos: tuple[float, float], pressed: tuple[bool, bool, bool]):
+        for card in self.cardsReversed:
+            if card.rect.collidepoint(pos):
+                #card.processMouse(pos, pressed)
+                card.drawTooltip(self.screen, 'Top')
+                break
+
     def getPokerHand(self) -> str:
         if self.isFlush() and self.isStraight():
             return 'Straight Flush'
@@ -59,15 +93,28 @@ class CardGroup():
     
     def sort(self, method: Literal['Suit', 'Rank'] = 'Rank') -> None:
         if method == 'Suit':
-            self.cards.sort(key=lambda card: (card.suit, card.value))
+            self.cards.sort(key=suitSort)
         else:
             self.cards.sort(key=lambda card: (card.value, card.suit), reverse=True)
+        self.cardsReversed = self.cards[::-1]
 
-    def addCards(self, card: list[Card]) -> None:
-        self.cards.extend(card)
+    def addCard(self, card: Card) -> None:
+        self.cards.append(card)
+        self.cardsReversed.insert(0, card)
+        self.selectedCards.append(False)
     
     def removeCard(self, card: Card) -> None:
         self.cards.remove(card)
+        self.cardsReversed = self.cards[::-1]
+        self.selectedCards.pop(self.cards.index(card))
+
+    def addCards(self, cards: list[Card]) -> None: 
+        for card in cards:
+            self.addCard(card)
+
+    def removeCards(self, cards: list[Card]) -> None:
+        for card in cards:
+            self.removeCard(card)
     
     def __len__(self) -> int:
         return len(self.cards)
